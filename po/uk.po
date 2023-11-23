@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Xfce Apps\n"
 "Report-Msgid-Bugs-To: https://gitlab.xfce.org/\n"
-"POT-Creation-Date: 2023-03-16 12:49+0100\n"
+"POT-Creation-Date: 2023-05-30 00:51+0200\n"
 "PO-Revision-Date: 2013-07-03 18:39+0000\n"
 "Last-Translator: Gordon Freeman, 2023\n"
 "Language-Team: Ukrainian (http://app.transifex.com/xfce/xfce-apps/language/uk/)\n"
@@ -150,7 +150,7 @@ msgstr "Поведінка"
 
 #: panel-plugin/notification-plugin-settings.glade:285
 msgid "After showing the menu"
-msgstr ""
+msgstr "Після показу меню"
 
 #: panel-plugin/notification-plugin-settings.glade:299
 msgid "Mark all log entries read"
@@ -171,12 +171,6 @@ msgstr "Додаток Повідомлень"
 #: panel-plugin/notification-plugin.desktop.in:6
 msgid "Notification plugin for the Xfce panel"
 msgstr "Додаток повідомлень для панелі Xfce"
-
-#: panel-plugin/notification-plugin.desktop.in:7
-#: xfce4-notifyd/xfce4-notifyd.desktop.in:6
-#: xfce4-notifyd-config/xfce4-notifyd-config.desktop.in:7
-msgid "org.xfce.notification"
-msgstr "org.xfce.notification"
 
 #: xfce4-notifyd/main.c:58 xfce4-notifyd/main.c:77
 #: xfce4-notifyd-config/main.c:1207
@@ -225,21 +219,21 @@ msgstr "Не вдалося відкрити журнал сповіщень: %s
 #: xfce4-notifyd/xfce-notify-log.c:335
 #, c-format
 msgid "Failed to prepare SQL statement: %%s (%s)"
-msgstr ""
+msgstr "Не вдалося підготувати інструкцію SQL: %%s (%s)"
 
 #: xfce4-notifyd/xfce-notify-log.c:364
 msgid "trailing characters at end of statement"
-msgstr ""
+msgstr "завершальні символи в кінці інструкції"
 
 #: xfce4-notifyd/xfce-notify-log.c:468
 #, c-format
 msgid "Failed to create 'notifications' table: %s"
-msgstr ""
+msgstr "Не вдалося створити таблицю «сповіщень»: %s"
 
 #: xfce4-notifyd/xfce-notify-log.c:469
 #, c-format
 msgid "Failed to create DB timestamp index: %s"
-msgstr ""
+msgstr "Не вдалося створити індекс позначки часу БД: %s"
 
 #: xfce4-notifyd/xfce-notify-log.c:470
 #, c-format
@@ -399,7 +393,7 @@ msgstr "_Вислизання"
 
 #: xfce4-notifyd-config/xfce4-notifyd-config.glade:341
 msgid "Do not disturb"
-msgstr "Не чіпати"
+msgstr "Не турбувати"
 
 #: xfce4-notifyd-config/xfce4-notifyd-config.glade:365
 msgid "<b>Behavior</b>"
@@ -423,7 +417,7 @@ msgstr "Показати повідомлення на"
 msgid ""
 "The \"Enable event sounds\" setting in the Appearance Settings dialog must "
 "be checked to hear notification sounds"
-msgstr ""
+msgstr "Параметр «Увімкнути звуки подій» у налаштуваннях зовнішнього вигляду має бути включен, щоб було чутно звуки сповіщень"
 
 #: xfce4-notifyd-config/xfce4-notifyd-config.glade:409
 msgid "_Mute sounds"
@@ -513,11 +507,11 @@ msgstr "_Тема"
 msgid ""
 "Show the notification summary and body when the notification is a percent "
 "value, such as audio volume or screen brightness"
-msgstr ""
+msgstr "Показувати зведення та текст сповіщення, якщо сповіщення є відсотковим значенням, наприклад гучність звуку чи яскравість екрана"
 
 #: xfce4-notifyd-config/xfce4-notifyd-config.glade:667
 msgid "Show text with percent _values"
-msgstr ""
+msgstr "Показувати текст із _відсотковими значеннями"
 
 #: xfce4-notifyd-config/xfce4-notifyd-config.glade:681
 msgid "Date/time _format"

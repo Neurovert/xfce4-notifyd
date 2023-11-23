@@ -16,7 +16,7 @@ m4_define([dbus_minimum_version], [1.0])
 m4_define([systemd_minimum_version], [245])
 
 dnl version info
-XDT_VERSION_INIT([0.8.2], [git])
+XDT_VERSION_INIT([0.9.3], [git])
 
 dnl init autoconf
 AC_INIT([xfce4-notifyd], [xdt_version],
@@ -113,7 +113,7 @@ AC_ARG_WITH([dbus-service-dir],
             [AS_HELP_STRING([--with-dbus-service-dir=DIR],
                             [Specifies the directory where D-Bus service activation files should be installed (default=${datadir}/dbus-1/services)])],
             [dbus_service_dir=$withval], [dbus_service_dir="${datadir}/dbus-1/services"])
-if test x"$dbus_service_dir" = x"auto"; then
+if test x"$use_dbus_start_daemon" = x"yes" -a x"$dbus_service_dir" = x"auto"; then
     dbus_service_dir="`$PKG_CONFIG --variable=session_bus_services_dir dbus-1`"
 fi
 DBUS_SERVICE_DIR="$dbus_service_dir"
@@ -121,7 +121,10 @@ AC_SUBST([DBUS_SERVICE_DIR])
 
 dnl systemd service files
 XDT_CHECK_OPTIONAL_PACKAGE([SYSTEMD], [systemd], [systemd_minimum_version], [systemd], [systemd])
-AM_CONDITIONAL([USE_SYSTEMD], [test x"$SYSTEMD_FOUND" = x"yes"])
+if test x"$enable_systemd" != x"no"; then
+    enable_systemd=yes
+fi
+AM_CONDITIONAL([USE_SYSTEMD], [test x"$enable_systemd" = x"yes"])
 
 dnl note that the default does not use ${libdir}, as that is often something
 dnl like ${prefix}/lib/x86_64-linux-gnu, which is generally not correct for
@@ -130,17 +133,22 @@ AC_ARG_WITH([systemd-user-service-dir],
             [AS_HELP_STRING([--with-systemd-user-service-dir=DIR],
                             [Specifies the directory where user bus services should be installed (default=${prefix}/lib/systemd/user)])],
             [systemd_user_service_dir=$withval], [systemd_user_service_dir="${prefix}/lib/systemd/user"])
-if test x"$systemd_user_service_dir" = x"auto"; then
-    systemd_user_service_dir="`$PKG_CONFIG --variable=systemd_user_unit_dir systemd`"
+if test x"$enable_systemd" != x"no"; then
+    if test x"$systemd_user_service_dir" = x"auto"; then
+        if test x"$SYSTEMD_FOUND" != x"yes"; then
+            AC_MSG_ERROR([systemd was not found, but --systemd-user-service-dir=auto was passed])
+        fi
+        systemd_user_service_dir="`$PKG_CONFIG --variable=systemd_user_unit_dir systemd`"
+    fi
+    SYSTEMD_USER_SERVICE_DIR="$systemd_user_service_dir"
+    AC_SUBST([SYSTEMD_USER_SERVICE_DIR])
 fi
-SYSTEMD_USER_SERVICE_DIR="$systemd_user_service_dir"
-AC_SUBST([SYSTEMD_USER_SERVICE_DIR])
 
 dnl XDG autostart files
 AC_ARG_ENABLE([xdg-autostart],
-              [AS_HELP_STRING([--enable-xdg-autostart],
-                              [Install an XDG autostart file to start xfce4-notifyd when the desktop session starts (default=disabled)])],
-              [use_xdg_autostart=$enableval], [use_xdg_autostart=no])
+              [AS_HELP_STRING([--disable-xdg-autostart],
+                              [Do not install an XDG autostart file to start xfce4-notifyd when the desktop session starts (default=enabled)])],
+              [use_xdg_autostart=$enableval], [use_xdg_autostart=yes])
 AM_CONDITIONAL([USE_XDG_AUTOSTART],
                [test x"$use_xdg_autostart" = x"yes"])
 
@@ -183,6 +191,6 @@ echo "* Wayland Support:           $ENABLE_WAYLAND"
 echo "* Sound support:             $ENABLE_SOUND"
 echo "* Startup methods:"
 echo "  - D-Bus activation:        $use_dbus_start_daemon ($DBUS_SERVICE_DIR)"
-echo "  - Systemd:                 $SYSTEMD_FOUND ($SYSTEMD_USER_SERVICE_DIR)"
+echo "  - Systemd:                 $enable_systemd ($SYSTEMD_USER_SERVICE_DIR)"
 echo "  - XDG autostart:           $use_xdg_autostart ($sysconfdir/xdg/autostart)"
 echo

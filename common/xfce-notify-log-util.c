@@ -93,11 +93,14 @@ notify_pixbuf_from_image_data (GVariant *image_data)
                                g_variant_get_size(pixel_data));
     g_variant_unref(pixel_data);
 
-    pix = gdk_pixbuf_new_from_data(data,
-                                   GDK_COLORSPACE_RGB, has_alpha,
-                                   bits_per_sample, width, height,
-                                   rowstride,
-                                   notify_free, NULL);
+    if (data != NULL) {
+        pix = gdk_pixbuf_new_from_data(data,
+                                       GDK_COLORSPACE_RGB, has_alpha,
+                                       bits_per_sample, width, height,
+                                       rowstride,
+                                       notify_free, NULL);
+    }
+
     return pix;
 }
 
@@ -373,7 +376,7 @@ notify_closure_free(gpointer data,
 }
 
 GtkWidget *
-xfce_notify_clear_log_dialog(XfceNotifyLogGBus *log) {
+xfce_notify_clear_log_dialog(XfceNotifyLogGBus *log, GtkWindow *parent) {
     GtkWidget *dialog, *grid, *icon, *label, *content_area, *checkbutton;
     GtkDialogFlags flags = GTK_DIALOG_MODAL;
     gchar *icon_cache_size;
@@ -383,7 +386,7 @@ xfce_notify_clear_log_dialog(XfceNotifyLogGBus *log) {
     ClearLogResponseData *rdata;
 
     dialog = gtk_dialog_new_with_buttons (_("Clear notification log"),
-                                          NULL,
+                                          parent,
                                           flags,
                                           _("Cancel"),
                                           GTK_RESPONSE_CANCEL,
@@ -392,6 +395,7 @@ xfce_notify_clear_log_dialog(XfceNotifyLogGBus *log) {
                                           NULL);
     content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
     grid = gtk_grid_new ();
+    gtk_grid_set_row_spacing(GTK_GRID(grid), 6);
     gtk_grid_set_column_spacing (GTK_GRID (grid), 12);
     gtk_widget_set_margin_start (grid, 12);
     gtk_widget_set_margin_end (grid, 12);
@@ -424,6 +428,9 @@ xfce_notify_clear_log_dialog(XfceNotifyLogGBus *log) {
 
     gtk_container_add (GTK_CONTAINER (content_area), grid);
     gtk_widget_show_all (dialog);
+
+    GtkWidget *cancel = gtk_dialog_get_widget_for_response(GTK_DIALOG(dialog), GTK_RESPONSE_CANCEL);
+    gtk_widget_grab_focus(cancel);
 
     rdata = g_new0(ClearLogResponseData, 1);
     rdata->log = log;
@@ -514,10 +521,8 @@ gchar *
 notify_log_format_body(const gchar *body) {
     if (body == NULL || body[0] == '\0') {
         return NULL;
-    } else if (xfce_notify_is_markup_valid(body)) {
-        return g_strdup(body);
     } else {
-        return g_markup_escape_text(body, -1);
+        return xfce_notify_sanitize_markup(body);
     }
 }
 
