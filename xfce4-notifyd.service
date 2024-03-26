@@ -1,0 +1,14 @@
+[Unit]
+After=dbus.service
+StartLimitBurst=0
+Wants=dbus.service
+
+
+[Service]
+Restart=always
+Environment=
+RestartSec=1s
+ExecStart=/home/vioner/Scripts/xfce4-notifyd-starter.sh
+
+[Install]
+WantedBy=default.target
