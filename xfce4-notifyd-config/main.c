@@ -29,6 +29,13 @@
 #include <string.h>
 #endif
 
+#ifdef HAVE_XFCE_REVISION_H
+#include "xfce-revision.h"
+#define VERSION_STRING VERSION "-" REVISION
+#else
+#define VERSION_STRING VERSION
+#endif
+
 #include <gio/gio.h>
 #include <gio/gdesktopappinfo.h>
 #include <gtk/gtk.h>
@@ -1042,6 +1049,15 @@ xfce4_notifyd_config_setup_dialog(SettingsPanel *panel, GtkBuilder *builder) {
     xfconf_g_property_bind(panel->channel, NOTIFY_LOCATION_PROP, G_TYPE_STRING,
                            G_OBJECT(position_combo), "active-id");
 
+    GtkWidget *min_width_enabled = GTK_WIDGET(gtk_builder_get_object(builder, "min_width_enabled"));
+    gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(min_width_enabled), FALSE);
+    xfconf_g_property_bind(panel->channel, MIN_WIDTH_ENABLED_PROP, G_TYPE_BOOLEAN, min_width_enabled, "active");
+
+    GtkWidget *min_width = GTK_WIDGET(gtk_builder_get_object(builder, "min_width"));
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(min_width), MIN_WIDTH_DEFAULT);
+    xfconf_g_property_bind(panel->channel, MIN_WIDTH_PROP, G_TYPE_UINT, min_width, "value");
+    g_object_bind_property(min_width_enabled, "active", min_width, "sensitive", G_BINDING_SYNC_CREATE);
+
     slider = GTK_WIDGET(gtk_builder_get_object(builder, "opacity_slider"));
     g_signal_connect(G_OBJECT(slider), "format-value",
                      G_CALLBACK(xfce4_notifyd_slider_format_value), NULL);
@@ -1163,7 +1179,6 @@ int
 main(int argc,
      char **argv)
 {
-    SettingsPanel *panel = g_new0(SettingsPanel, 1);
     GtkWidget *settings_dialog = NULL;
     GtkWidget *notifyd_running;
     GtkBuilder *builder;
@@ -1173,7 +1188,7 @@ main(int argc,
     GOptionEntry option_entries[] = {
         { "version", 'V', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, &opt_version, N_("Display version information"), NULL },
         { "socket-id", 's', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_INT, &opt_socket_id, N_("Settings manager socket"), N_("SOCKET_ID") },
-        { NULL, },
+        { NULL, '\0', 0, 0, NULL, NULL, NULL },
     };
     GError *error = NULL;
 
@@ -1192,7 +1207,7 @@ main(int argc,
     }
 
     if(G_UNLIKELY(opt_version)) {
-        g_print("%s %s\n", G_LOG_DOMAIN, VERSION);
+        g_print("%s %s\n", G_LOG_DOMAIN, VERSION_STRING);
         g_print("Copyright (c) 2008-2011,2023 Brian Tarricone <brian@tarricone.org>\n");
         g_print("Copyright (c) 2010 Jérôme Guelfucci <jeromeg@xfce.org>\n");
         g_print("Copyright (c) 2016 Ali Abdallah <ali@xfce.org>\n");
@@ -1226,6 +1241,7 @@ main(int argc,
         return EXIT_FAILURE;
     }
 
+    SettingsPanel *panel = g_new0(SettingsPanel, 1);
     panel->channel = xfconf_channel_new("xfce4-notifyd");
     xfce_notify_migrate_settings(panel->channel);
 
